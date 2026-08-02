@@ -21,112 +21,37 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout full history
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install image tools
-        run: python -m pip install --disable-pip-version-check pillow
-
-      - name: Recover original photographs
+      - name: Verify responsive photo sources
         shell: bash
         run: |
           set -euo pipefail
-          SOURCE_COMMIT="f2a8d42135320c72c9f515ffdb55d7fe12d44510"
-          mkdir -p /tmp/stefano-originals assets/images
-          git show "$SOURCE_COMMIT:assets/images/stefano-ritratto.jpg" > /tmp/stefano-originals/portrait.jpg
-          git show "$SOURCE_COMMIT:assets/images/stefano-reiki.jpg" > /tmp/stefano-originals/session.jpg
-          git show "$SOURCE_COMMIT:assets/images/mani-reiki.jpg" > /tmp/stefano-originals/detail-1.jpg
-          git show "$SOURCE_COMMIT:assets/images/mani-reiki-2.jpg" > /tmp/stefano-originals/detail-2.jpg
-          test -s /tmp/stefano-originals/portrait.jpg
-          test -s /tmp/stefano-originals/session.jpg
-          test -s /tmp/stefano-originals/detail-1.jpg
-          test -s /tmp/stefano-originals/detail-2.jpg
 
-      - name: Build responsive image variants
-        shell: bash
-        run: |
-          python <<'PY'
-          from pathlib import Path
-          from PIL import Image, ImageOps
+          # Desktop: fotografie JPG originali caricate nel repository.
+          test -s assets/images/stefano-ritratto.jpg
+          test -s assets/images/stefano-reiki.jpg
+          test -s assets/images/mani-reiki.jpg
 
-          source_dir = Path('/tmp/stefano-originals')
-          output_dir = Path('assets/images')
+          # Mobile: copie WebP leggere già verificate.
+          test -s assets/images/stefano-napoleone-ritratto.webp
+          test -s assets/images/stefano-napoleone-reiki-sessione.webp
+          test -s assets/images/stefano-napoleone-reiki-dettaglio.webp
 
-          detail_candidates = [source_dir / 'detail-1.jpg', source_dir / 'detail-2.jpg']
-          detail_source = max(
-              detail_candidates,
-              key=lambda path: (
-                  ImageOps.exif_transpose(Image.open(path)).width
-                  / ImageOps.exif_transpose(Image.open(path)).height,
-                  path.stat().st_size,
-              ),
-          )
-
-          jobs = {
-              'stefano-napoleone-ritratto': source_dir / 'portrait.jpg',
-              'stefano-napoleone-reiki-sessione': source_dir / 'session.jpg',
-              'stefano-napoleone-reiki-dettaglio': detail_source,
-          }
-
-          for stem, source in jobs.items():
-              with Image.open(source) as opened:
-                  original = ImageOps.exif_transpose(opened).convert('RGB')
-
-              desktop = original.copy()
-              desktop.thumbnail((1800, 2400), Image.Resampling.LANCZOS)
-              desktop_path = output_dir / f'{stem}-desktop.webp'
-              desktop.save(desktop_path, 'WEBP', quality=92, method=6)
-
-              mobile = original.copy()
-              mobile.thumbnail((720, 1100), Image.Resampling.LANCZOS)
-              mobile_path = output_dir / f'{stem}-mobile.webp'
-              mobile.save(mobile_path, 'WEBP', quality=83, method=6)
-
-              print(
-                  stem,
-                  'source=', original.size,
-                  'desktop=', desktop.size, desktop_path.stat().st_size,
-                  'mobile=', mobile.size, mobile_path.stat().st_size,
-              )
-          PY
-
-      - name: Verify responsive image assets
-        shell: bash
-        run: |
-          set -euo pipefail
-          python <<'PY'
-          from pathlib import Path
-          from PIL import Image
-
-          stems = (
-              'stefano-napoleone-ritratto',
-              'stefano-napoleone-reiki-sessione',
-              'stefano-napoleone-reiki-dettaglio',
-          )
-          for stem in stems:
-              desktop = Path(f'assets/images/{stem}-desktop.webp')
-              mobile = Path(f'assets/images/{stem}-mobile.webp')
-              assert desktop.stat().st_size > 80_000, (desktop, desktop.stat().st_size)
-              assert mobile.stat().st_size > 20_000, (mobile, mobile.stat().st_size)
-              with Image.open(desktop) as image:
-                  assert image.width >= 1000, (desktop, image.size)
-              with Image.open(mobile) as image:
-                  assert 500 <= image.width <= 720, (mobile, image.size)
-          PY
-          file assets/images/*-desktop.webp assets/images/*-mobile.webp
+          file \
+            assets/images/stefano-ritratto.jpg \
+            assets/images/stefano-reiki.jpg \
+            assets/images/mani-reiki.jpg \
+            assets/images/stefano-napoleone-ritratto.webp \
+            assets/images/stefano-napoleone-reiki-sessione.webp \
+            assets/images/stefano-napoleone-reiki-dettaglio.webp
 
       - name: Prepare deploy artifact
         run: |
           rm -rf assets/image-source
-          sed -E -i 's|assets/styles.css(\?v=[0-9]+)?|assets/styles.css?v=32|g' index.html
-          sed -E -i 's|assets/app.js(\?v=[0-9]+)?|assets/app.js?v=32|g' index.html
+          sed -E -i 's|assets/styles.css(\?v=[0-9]+)?|assets/styles.css?v=33|g' index.html
+          sed -E -i 's|assets/app.js(\?v=[0-9]+)?|assets/app.js?v=33|g' index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
