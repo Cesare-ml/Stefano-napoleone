@@ -24,6 +24,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build high-resolution portrait
+        shell: bash
+        run: |
+          cat assets/image-source/portrait-hq/part-*.b64 \
+            | tr -d '\n\r ' \
+            | base64 --decode \
+            > assets/images/stefano-napoleone-ritratto.webp
+          echo "2440dd3de666988b3b93bc55e69b85b3451fd67a69c3576d452d5c2a22a1f3ce  assets/images/stefano-napoleone-ritratto.webp" | sha256sum --check
+          test "$(stat -c%s assets/images/stefano-napoleone-ritratto.webp)" -eq 44388
+          file assets/images/stefano-napoleone-ritratto.webp
+
       - name: Verify image assets
         run: |
           test -s assets/images/stefano-napoleone-ritratto.webp
@@ -31,10 +42,11 @@ jobs:
           test -s assets/images/stefano-napoleone-reiki-dettaglio.webp
           file assets/images/*.webp
 
-      - name: Bust browser cache
+      - name: Prepare deploy artifact
         run: |
-          sed -i 's|assets/styles.css"|assets/styles.css?v=13"|g' index.html
-          sed -i 's|assets/app.js"|assets/app.js?v=13"|g' index.html
+          rm -rf assets/image-source
+          sed -E -i 's|assets/styles.css(\?v=[0-9]+)?|assets/styles.css?v=21|g' index.html
+          sed -E -i 's|assets/app.js(\?v=[0-9]+)?|assets/app.js?v=21|g' index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
