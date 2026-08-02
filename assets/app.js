@@ -1,6 +1,6 @@
 const photosCss=document.createElement('link');
 photosCss.rel='stylesheet';
-photosCss.href='assets/photos.css?v=34';
+photosCss.href='assets/photos.css?v=35';
 document.head.appendChild(photosCss);
 
 document.documentElement.style.overflowX='hidden';
