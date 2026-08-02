@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Build and deploy GitHub Pages
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -23,35 +23,137 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Verify responsive photo sources
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Verify original photographs
         shell: bash
         run: |
           set -euo pipefail
-
-          # Desktop: fotografie JPG originali caricate nel repository.
           test -s assets/images/stefano-ritratto.jpg
           test -s assets/images/stefano-reiki.jpg
           test -s assets/images/mani-reiki.jpg
-
-          # Mobile: copie WebP leggere già verificate.
-          test -s assets/images/stefano-napoleone-ritratto.webp
-          test -s assets/images/stefano-napoleone-reiki-sessione.webp
-          test -s assets/images/stefano-napoleone-reiki-dettaglio.webp
-
           file \
             assets/images/stefano-ritratto.jpg \
             assets/images/stefano-reiki.jpg \
-            assets/images/mani-reiki.jpg \
-            assets/images/stefano-napoleone-ritratto.webp \
-            assets/images/stefano-napoleone-reiki-sessione.webp \
-            assets/images/stefano-napoleone-reiki-dettaglio.webp
+            assets/images/mani-reiki.jpg
+
+      - name: Generate desktop and mobile variants
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps
+
+          output = Path('assets/images')
+          jobs = {
+              'stefano-napoleone-ritratto': output / 'stefano-ritratto.jpg',
+              'stefano-napoleone-reiki-sessione': output / 'stefano-reiki.jpg',
+              'stefano-napoleone-reiki-dettaglio': output / 'mani-reiki.jpg',
+          }
+
+          for stem, source in jobs.items():
+              with Image.open(source) as opened:
+                  original = ImageOps.exif_transpose(opened).convert('RGB')
+
+              desktop = original.copy()
+              desktop.thumbnail((1800, 2400), Image.Resampling.LANCZOS)
+              desktop_path = output / f'{stem}-desktop.webp'
+              desktop.save(desktop_path, 'WEBP', quality=91, method=6)
+
+              mobile = original.copy()
+              mobile.thumbnail((720, 1100), Image.Resampling.LANCZOS)
+              mobile_path = output / f'{stem}-mobile.webp'
+              mobile.save(mobile_path, 'WEBP', quality=83, method=6)
+
+              print(
+                  stem,
+                  'original=', original.size,
+                  'desktop=', desktop.size, desktop_path.stat().st_size,
+                  'mobile=', mobile.size, mobile_path.stat().st_size,
+              )
+          PY
+
+      - name: Verify generated variants
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          stems = (
+              'stefano-napoleone-ritratto',
+              'stefano-napoleone-reiki-sessione',
+              'stefano-napoleone-reiki-dettaglio',
+          )
+
+          for stem in stems:
+              desktop = Path(f'assets/images/{stem}-desktop.webp')
+              mobile = Path(f'assets/images/{stem}-mobile.webp')
+
+              assert desktop.stat().st_size > 80_000, (desktop, desktop.stat().st_size)
+              assert mobile.stat().st_size > 20_000, (mobile, mobile.stat().st_size)
+
+              with Image.open(desktop) as image:
+                  assert image.width >= 1000, (desktop, image.size)
+              with Image.open(mobile) as image:
+                  assert 500 <= image.width <= 720, (mobile, image.size)
+          PY
+
+      - name: Switch website to generated variants
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path('assets/app.js')
+          content = path.read_text(encoding='utf-8')
+
+          replacements = {
+              'assets/photos.css?v=33': 'assets/photos.css?v=34',
+              'assets/images/stefano-napoleone-ritratto.webp?v=33': 'assets/images/stefano-napoleone-ritratto-mobile.webp?v=34',
+              'assets/images/stefano-ritratto.jpg?v=33': 'assets/images/stefano-napoleone-ritratto-desktop.webp?v=34',
+              'assets/images/stefano-napoleone-reiki-sessione.webp?v=33': 'assets/images/stefano-napoleone-reiki-sessione-mobile.webp?v=34',
+              'assets/images/stefano-reiki.jpg?v=33': 'assets/images/stefano-napoleone-reiki-sessione-desktop.webp?v=34',
+              'assets/images/stefano-napoleone-reiki-dettaglio.webp?v=33': 'assets/images/stefano-napoleone-reiki-dettaglio-mobile.webp?v=34',
+              'assets/images/mani-reiki.jpg?v=33': 'assets/images/stefano-napoleone-reiki-dettaglio-desktop.webp?v=34',
+          }
+
+          for old, new in replacements.items():
+              content = content.replace(old, new)
+
+          path.write_text(content, encoding='utf-8')
+          PY
+
+      - name: Commit responsive assets to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            assets/app.js \
+            assets/images/*-desktop.webp \
+            assets/images/*-mobile.webp
+
+          if ! git diff --cached --quiet; then
+            git commit -m "perf: publish responsive photo variants [skip ci]"
+            git push origin HEAD:main
+          fi
 
       - name: Prepare deploy artifact
         run: |
           rm -rf assets/image-source
-          sed -E -i 's|assets/styles.css(\?v=[0-9]+)?|assets/styles.css?v=33|g' index.html
-          sed -E -i 's|assets/app.js(\?v=[0-9]+)?|assets/app.js?v=33|g' index.html
+          sed -E -i 's|assets/styles.css(\?v=[0-9]+)?|assets/styles.css?v=34|g' index.html
+          sed -E -i 's|assets/app.js(\?v=[0-9]+)?|assets/app.js?v=34|g' index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
