@@ -1,0 +1,35 @@
+name: Optimize website images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/images/*.jpg'
+      - '.github/workflows/optimize-images.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+
+      - name: Create optimized WebP images
+        run: |
+          magick assets/images/stefano-ritratto.jpg -auto-orient -resize '1400x1400>' -strip -quality 76 assets/images/stefano-ritratto-optimized.webp
+          magick assets/images/stefano-reiki.jpg -auto-orient -resize '1400x1400>' -strip -quality 74 assets/images/stefano-reiki-optimized.webp
+          magick assets/images/mani-reiki.jpg -auto-orient -resize '1400x1400>' -strip -quality 74 assets/images/mani-reiki-optimized.webp
+
+      - name: Commit optimized images
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/images/*-optimized.webp
+          git diff --cached --quiet || git commit -m 'perf: optimize website photography'
+          git push
