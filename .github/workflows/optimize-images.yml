@@ -22,9 +22,9 @@ jobs:
 
       - name: Create optimized WebP images
         run: |
-          magick assets/images/stefano-ritratto.jpg -auto-orient -resize '1400x1400>' -strip -quality 76 assets/images/stefano-ritratto-optimized.webp
-          magick assets/images/stefano-reiki.jpg -auto-orient -resize '1400x1400>' -strip -quality 74 assets/images/stefano-reiki-optimized.webp
-          magick assets/images/mani-reiki.jpg -auto-orient -resize '1400x1400>' -strip -quality 74 assets/images/mani-reiki-optimized.webp
+          convert assets/images/stefano-ritratto.jpg -auto-orient -resize '1400x1400>' -strip -quality 76 assets/images/stefano-ritratto-optimized.webp
+          convert assets/images/stefano-reiki.jpg -auto-orient -resize '1400x1400>' -strip -quality 74 assets/images/stefano-reiki-optimized.webp
+          convert assets/images/mani-reiki.jpg -auto-orient -resize '1400x1400>' -strip -quality 74 assets/images/mani-reiki-optimized.webp
 
       - name: Commit optimized images
         run: |
