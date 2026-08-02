@@ -1,16 +1,16 @@
-const photosCss=document.createElement('link');photosCss.rel='stylesheet';photosCss.href='assets/photos.css?v=6';document.head.appendChild(photosCss);
+const photosCss=document.createElement('link');photosCss.rel='stylesheet';photosCss.href='assets/photos.css?v=7';document.head.appendChild(photosCss);
 
 const portrait=document.querySelector('.portrait-placeholder');
 if(portrait){
   portrait.setAttribute('aria-label','Ritratto di Stefano Napoleone');
-  portrait.innerHTML='<img src="assets/images/stefano-napoleone-ritratto.webp?v=3" alt="Stefano Napoleone, operatore Reiki e studioso di numerologia evolutiva" loading="eager" fetchpriority="high">';
+  portrait.innerHTML='<img src="assets/images/stefano-ritratto.jpg?v=2" alt="Stefano Napoleone, operatore Reiki e studioso di numerologia evolutiva" loading="eager" fetchpriority="high" decoding="async">';
 }
 
 const energyContent=document.querySelector('.path-energy .path-content');
 if(energyContent){
   const session=document.createElement('figure');
   session.className='reiki-photo';
-  session.innerHTML='<img src="assets/images/stefano-napoleone-reiki-dettaglio.webp?v=3" alt="Le mani di Stefano Napoleone durante un trattamento Reiki" loading="lazy" decoding="async"><figcaption class="photo-caption">Un momento reale durante una sessione Reiki in presenza.</figcaption>';
+  session.innerHTML='<img src="assets/images/stefano-reiki.jpg?v=2" alt="Stefano Napoleone durante una sessione Reiki in presenza" loading="lazy" decoding="async"><figcaption class="photo-caption">Una sessione Reiki in presenza, in uno spazio tranquillo e rispettoso.</figcaption>';
   const tagline=energyContent.querySelector('.path-tagline');
   tagline?.insertAdjacentElement('afterend',session);
 }
