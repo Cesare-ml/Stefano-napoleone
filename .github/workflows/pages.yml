@@ -152,8 +152,8 @@ jobs:
       - name: Prepare deploy artifact
         run: |
           rm -rf assets/image-source
-          sed -E -i 's|assets/styles.css(\?v=[0-9]+)?|assets/styles.css?v=34|g' index.html
-          sed -E -i 's|assets/app.js(\?v=[0-9]+)?|assets/app.js?v=34|g' index.html
+          sed -E -i 's|assets/styles.css(\?v=[0-9]+)?|assets/styles.css?v=35|g' index.html
+          sed -E -i 's|assets/app.js(\?v=[0-9]+)?|assets/app.js?v=35|g' index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
