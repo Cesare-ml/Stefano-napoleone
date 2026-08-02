@@ -1,6 +1,6 @@
 const photosCss=document.createElement('link');
 photosCss.rel='stylesheet';
-photosCss.href='assets/photos.css?v=33';
+photosCss.href='assets/photos.css?v=34';
 document.head.appendChild(photosCss);
 
 document.documentElement.style.overflowX='hidden';
@@ -11,9 +11,9 @@ if(portrait){
   portrait.setAttribute('aria-label','Ritratto di Stefano Napoleone');
   portrait.innerHTML=`
     <picture>
-      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-ritratto.webp?v=33" type="image/webp">
+      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-ritratto-mobile.webp?v=34" type="image/webp">
       <img
-        src="assets/images/stefano-ritratto.jpg?v=33"
+        src="assets/images/stefano-napoleone-ritratto-desktop.webp?v=34"
         alt="Stefano Napoleone, operatore Reiki e studioso di numerologia evolutiva"
         width="1157"
         height="1536"
@@ -29,9 +29,9 @@ if(energyContent){
   session.className='reiki-photo';
   session.innerHTML=`
     <picture>
-      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-sessione.webp?v=33" type="image/webp">
+      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-sessione-mobile.webp?v=34" type="image/webp">
       <img
-        src="assets/images/stefano-reiki.jpg?v=33"
+        src="assets/images/stefano-napoleone-reiki-sessione-desktop.webp?v=34"
         alt="Stefano Napoleone durante una sessione Reiki in presenza"
         width="1157"
         height="1536"
@@ -46,9 +46,9 @@ if(energyContent){
   detail.className='reiki-detail-photo';
   detail.innerHTML=`
     <picture>
-      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-dettaglio.webp?v=33" type="image/webp">
+      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-dettaglio-mobile.webp?v=34" type="image/webp">
       <img
-        src="assets/images/mani-reiki.jpg?v=33"
+        src="assets/images/stefano-napoleone-reiki-dettaglio-desktop.webp?v=34"
         alt="Dettaglio delle mani di Stefano durante un trattamento Reiki"
         width="1536"
         height="1157"
