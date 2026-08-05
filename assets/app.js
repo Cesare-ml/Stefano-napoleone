@@ -1,6 +1,6 @@
 const photosCss=document.createElement('link');
 photosCss.rel='stylesheet';
-photosCss.href='assets/photos.css?v=35';
+photosCss.href='assets/photos.css?v=36';
 document.head.appendChild(photosCss);
 
 document.documentElement.style.overflowX='hidden';
@@ -8,13 +8,13 @@ document.body.style.overflowX='hidden';
 
 const portrait=document.querySelector('.portrait-placeholder');
 if(portrait){
-  portrait.setAttribute('aria-label','Ritratto di Stefano Napoleone');
+  portrait.setAttribute('aria-label','Stefano Napoleone durante una sessione Reiki');
   portrait.innerHTML=`
     <picture>
-      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-ritratto-mobile.webp?v=34" type="image/webp">
+      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-sessione-mobile.webp?v=36" type="image/webp">
       <img
-        src="assets/images/stefano-napoleone-ritratto-desktop.webp?v=34"
-        alt="Stefano Napoleone, operatore Reiki e studioso di numerologia evolutiva"
+        src="assets/images/stefano-napoleone-reiki-sessione-desktop.webp?v=36"
+        alt="Stefano Napoleone durante una sessione Reiki in presenza"
         width="1157"
         height="1536"
         loading="eager"
@@ -29,26 +29,9 @@ if(energyContent){
   session.className='reiki-photo';
   session.innerHTML=`
     <picture>
-      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-sessione-mobile.webp?v=34" type="image/webp">
+      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-dettaglio-mobile.webp?v=36" type="image/webp">
       <img
-        src="assets/images/stefano-napoleone-reiki-sessione-desktop.webp?v=34"
-        alt="Stefano Napoleone durante una sessione Reiki in presenza"
-        width="1157"
-        height="1536"
-        loading="lazy"
-        decoding="async">
-    </picture>
-    <figcaption class="photo-caption">Una sessione Reiki in presenza, in uno spazio tranquillo e rispettoso.</figcaption>`;
-  const tagline=energyContent.querySelector('.path-tagline');
-  tagline?.insertAdjacentElement('afterend',session);
-
-  const detail=document.createElement('figure');
-  detail.className='reiki-detail-photo';
-  detail.innerHTML=`
-    <picture>
-      <source media="(max-width: 700px)" srcset="assets/images/stefano-napoleone-reiki-dettaglio-mobile.webp?v=34" type="image/webp">
-      <img
-        src="assets/images/stefano-napoleone-reiki-dettaglio-desktop.webp?v=34"
+        src="assets/images/stefano-napoleone-reiki-dettaglio-desktop.webp?v=36"
         alt="Dettaglio delle mani di Stefano durante un trattamento Reiki"
         width="1536"
         height="1157"
@@ -56,8 +39,8 @@ if(energyContent){
         decoding="async">
     </picture>
     <figcaption class="photo-caption">Il contatto viene sempre adattato con delicatezza alla persona.</figcaption>`;
-  const offers=energyContent.querySelector('.offers');
-  offers?.insertAdjacentElement('beforebegin',detail);
+  const tagline=energyContent.querySelector('.path-tagline');
+  tagline?.insertAdjacentElement('afterend',session);
 }
 
 const header=document.querySelector('[data-header]');
