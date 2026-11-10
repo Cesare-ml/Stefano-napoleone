@@ -14,7 +14,7 @@ URL previsto: `https://cesare-ml.github.io/Stefano-napoleone/`
 
 ## Contatti pubblicati
 
-- WhatsApp: `331 867 5502`
+- WhatsApp: `345 590 7582`
 - Instagram: `@reiki45napoleonestefano`
 - Roma: Via Degas 89 e Via Naro 16
 
